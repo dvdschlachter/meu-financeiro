@@ -709,3 +709,65 @@ document.querySelector("#view-debts .section-head button").onclick = addDebt;
 configLoad();
 initSupabase();
 render();
+
+function atualizarCoresFinanceiras() {
+  const campos = [
+    "currentBalance",
+    "debtTotal",
+    "projectedBalance"
+  ];
+
+  campos.forEach((id) => {
+    const elemento = document.getElementById(id);
+    if (!elemento) return;
+
+    const texto = elemento.textContent.trim();
+
+    // Converte valores como R$ 1.234,56 ou -R$ 1.234,56
+    const numeroTexto = texto
+      .replace(/[^\d,.-]/g, "")
+      .replace(/\./g, "")
+      .replace(",", ".");
+
+    const valor = Number(numeroTexto);
+
+    elemento.classList.remove("pos", "neg");
+
+    if (!Number.isFinite(valor) || valor === 0) {
+      return;
+    }
+
+    elemento.classList.add(valor > 0 ? "pos" : "neg");
+  });
+}
+
+// Atualiza as cores quando os valores exibidos mudarem.
+function observarCoresFinanceiras() {
+  atualizarCoresFinanceiras();
+
+  const observador = new MutationObserver(() => {
+    atualizarCoresFinanceiras();
+  });
+
+  ["currentBalance", "debtTotal", "projectedBalance"]
+    .forEach((id) => {
+      const elemento = document.getElementById(id);
+
+      if (elemento) {
+        observador.observe(elemento, {
+          childList: true,
+          characterData: true,
+          subtree: true
+        });
+      }
+    });
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener(
+    "DOMContentLoaded",
+    observarCoresFinanceiras
+  );
+} else {
+  observarCoresFinanceiras();
+}
