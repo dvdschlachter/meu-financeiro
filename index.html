@@ -17,6 +17,89 @@ nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-ar
 h2{font-size:19px;margin:20px 0 12px}.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px}button,.btn{cursor:pointer;border:0;border-radius:11px;background:var(--green);color:#fff;font-weight:650;padding:11px 14px;font-size:14px}.btn-light{background:var(--green2);color:var(--green)}.btn-muted{background:#eef2ef;color:#29372d}.btn-danger{background:#fee2e2;color:#991b1b}.list{display:flex;flex-direction:column;gap:9px}.item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px;display:flex;align-items:flex-start;gap:10px;justify-content:space-between}.item-main{min-width:0;flex:1}.item-title{font-weight:650;overflow-wrap:anywhere}.item-sub{font-size:12px;color:var(--muted);margin-top:5px}.amount{font-weight:750;white-space:nowrap}.pill{font-size:11px;padding:4px 7px;border-radius:999px;background:#eef2ef;color:#47534a;display:inline-block;margin-top:6px}.empty{color:var(--muted);font-size:14px;text-align:center;padding:25px 12px;background:#fff;border-radius:14px}
 .panel{background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px;margin-bottom:12px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}label{font-size:13px;color:var(--muted)}input,select,textarea{width:100%;border:1px solid #d5ddd7;border-radius:10px;padding:12px;font:inherit;background:#fff;color:var(--text);min-height:44px}input[type=checkbox]{width:auto;min-height:auto} .form-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}.notice{font-size:12px;line-height:1.5;color:var(--muted);margin-top:12px}.hidden{display:none!important}.tabs{display:flex;gap:8px;overflow:auto;margin:10px 0 14px}.tabs button{white-space:nowrap}.sync-status{font-size:12px;color:#e4f8e8}
 @media(min-width:650px){main{padding:22px}.big{font-size:36px}.cards{grid-template-columns:repeat(4,1fr)}}
+
+/* Modo noturno */
+:root {
+  color-scheme: dark;
+  --bg: #0f1117;
+  --card: #191d27;
+  --text: #f1f5f9;
+  --muted: #a0aaba;
+  --border: #303746;
+  --primary: #818cf8;
+}
+
+html,
+body {
+  background-color: #0f1117 !important;
+  color: #f1f5f9 !important;
+}
+
+body {
+  color-scheme: dark;
+}
+
+header,
+nav,
+section,
+.card,
+.modal-content,
+.item,
+.stat-card,
+.panel,
+form {
+  background-color: #191d27;
+  color: #f1f5f9;
+  border-color: #303746;
+}
+
+input,
+select,
+textarea {
+  background-color: #10141c !important;
+  color: #f1f5f9 !important;
+  border-color: #3a4252 !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #8994a5;
+}
+
+button {
+  color: #f1f5f9;
+}
+
+button.btn-light,
+button.btn-muted {
+  background-color: #293142;
+  color: #f1f5f9;
+  border-color: #3a4252;
+}
+
+.item-sub,
+.muted,
+small,
+label {
+  color: #a0aaba;
+}
+
+.pill {
+  background-color: #293142;
+  color: #dbe4f0;
+}
+
+.pos {
+  color: #4ade80;
+}
+
+.neg {
+  color: #fb7185;
+}
+
+.hidden {
+  display: none !important;
+}
 </style>
 </head>
 <body>
