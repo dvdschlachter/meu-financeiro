@@ -234,14 +234,34 @@ function render() {
     ? recent.map(t => itemHTML(t, false)).join("")
     : '<div class="empty">Seus lançamentos aparecerão aqui.</div>';
 
+const hoje = new Date();
+hoje.setHours(0, 0, 0, 0);
+
+function converterData(data) {
+  return new Date(data + "T00:00:00");
+}
+
 const filtered = [...allTransactions()]
   .filter(t => filter === "all" || t.type === filter)
   .sort((a, b) => {
-    const dataA = new Date(a.date + "T00:00:00").getTime();
-    const dataB = new Date(b.date + "T00:00:00").getTime();
-    return dataB - dataA;
-  });
+    const dataA = converterData(a.date);
+    const dataB = converterData(b.date);
 
+    const futuroA = dataA > hoje;
+    const futuroB = dataB > hoje;
+
+    // Lançamentos de hoje ou anteriores aparecem primeiro
+    if (futuroA !== futuroB) {
+      return futuroA ? 1 : -1;
+    }
+
+    // Passados: mais recentes primeiro
+    // Futuros: mais próximos primeiro
+    return futuroA
+      ? dataA - dataB
+      : dataB - dataA;
+  });
+  
   $("transactionsList").innerHTML = filtered.length
     ? filtered.map(t => itemHTML(t)).join("")
     : '<div class="empty">Nenhum lançamento nesta categoria.</div>';
