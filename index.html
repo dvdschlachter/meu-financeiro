@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#14532d">
+<meta name="description" content="Controle financeiro pessoal, com lançamentos e previsões.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Meu Financeiro</title>
+<style>
+:root{--green:#166534;--green2:#dcfce7;--bg:#f4f7f5;--card:#fff;--text:#17231b;--muted:#647067;--red:#b91c1c;--line:#e3e9e5}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:calc(82px + env(safe-area-inset-bottom))}
+header{background:var(--green);color:#fff;padding:22px 18px 20px;border-radius:0 0 22px 22px}header .top{display:flex;justify-content:space-between;align-items:center;gap:12px}h1{font-size:22px;margin:0}header p{margin:6px 0 0;color:#d9fbe2;font-size:13px}
+main{max-width:760px;margin:auto;padding:16px}.balance{margin-top:18px;background:#fff;color:var(--text);border-radius:16px;padding:17px;box-shadow:0 3px 12px #0000000b}.label{font-size:13px;color:var(--muted)}.big{font-size:32px;font-weight:750;margin:6px 0 12px;letter-spacing:-.7px}.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mini{background:#f8faf8;border-radius:12px;padding:12px}.mini strong{display:block;margin-top:6px;font-size:18px;overflow-wrap:anywhere}.pos{color:var(--green)}.neg{color:var(--red)}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;background:#fff;border-top:1px solid var(--line);padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:3}nav button{border:0;background:none;color:var(--muted);font-size:11px;padding:5px 8px;display:flex;flex-direction:column;gap:4px;align-items:center}nav button.active{color:var(--green);font-weight:700}nav span{font-size:20px}
+h2{font-size:19px;margin:20px 0 12px}.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px}button,.btn{cursor:pointer;border:0;border-radius:11px;background:var(--green);color:#fff;font-weight:650;padding:11px 14px;font-size:14px}.btn-light{background:var(--green2);color:var(--green)}.btn-muted{background:#eef2ef;color:#29372d}.btn-danger{background:#fee2e2;color:#991b1b}.list{display:flex;flex-direction:column;gap:9px}.item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px;display:flex;align-items:flex-start;gap:10px;justify-content:space-between}.item-main{min-width:0;flex:1}.item-title{font-weight:650;overflow-wrap:anywhere}.item-sub{font-size:12px;color:var(--muted);margin-top:5px}.amount{font-weight:750;white-space:nowrap}.pill{font-size:11px;padding:4px 7px;border-radius:999px;background:#eef2ef;color:#47534a;display:inline-block;margin-top:6px}.empty{color:var(--muted);font-size:14px;text-align:center;padding:25px 12px;background:#fff;border-radius:14px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px;margin-bottom:12px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}label{font-size:13px;color:var(--muted)}input,select,textarea{width:100%;border:1px solid #d5ddd7;border-radius:10px;padding:12px;font:inherit;background:#fff;color:var(--text);min-height:44px}input[type=checkbox]{width:auto;min-height:auto} .form-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}.notice{font-size:12px;line-height:1.5;color:var(--muted);margin-top:12px}.hidden{display:none!important}.tabs{display:flex;gap:8px;overflow:auto;margin:10px 0 14px}.tabs button{white-space:nowrap}.sync-status{font-size:12px;color:#e4f8e8}
+@media(min-width:650px){main{padding:22px}.big{font-size:36px}.cards{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<header><div class="top"><div><h1>Meu Financeiro</h1><p>Seu dinheiro, organizado.</p></div><div id="syncBadge" class="sync-status">Somente neste aparelho</div></div>
+<div class="balance"><div class="label">Saldo atual</div><div class="big" id="currentBalance">R$ 0,00</div><div class="cards">
+<div class="mini"><span class="label">Entradas recebidas</span><strong class="pos" id="incomeTotal">R$ 0,00</strong></div>
+<div class="mini"><span class="label">Gastos pagos</span><strong class="neg" id="expenseTotal">R$ 0,00</strong></div>
+<div class="mini"><span class="label">Dívidas em aberto</span><strong id="debtTotal">R$ 0,00</strong></div>
+<div class="mini"><span class="label">Saldo projetado (30 dias)</span><strong id="projectedBalance">R$ 0,00</strong></div>
+</div></div></header>
+<main>
+<section id="view-home">
+<div class="section-head"><h2>Próximos movimentos</h2><button class="btn-light" onclick="openForm('transaction')">＋ Lançamento</button></div>
+<div id="upcomingList" class="list"></div>
+<h2>Últimos lançamentos</h2><div id="recentList" class="list"></div>
+</section>
+<section id="view-transactions" class="hidden">
+<div class="section-head"><h2>Lançamentos</h2><button onclick="openForm('transaction')">＋ Novo</button></div>
+<div class="tabs"><button class="btn-light" onclick="filterTransactions('all')">Todos</button><button class="btn-muted" onclick="filterTransactions('income')">Entradas</button><button class="btn-muted" onclick="filterTransactions('expense')">Gastos</button><button class="btn-muted" onclick="filterTransactions('debt')">Dívidas</button></div>
+<div id="transactionsList" class="list"></div>
+</section>
+<section id="view-debts" class="hidden">
+<div class="section-head"><h2>Dívidas</h2><button onclick="openForm('debt')">＋ Nova dívida</button></div>
+<p class="notice">Cadastre a dívida e suas parcelas. O cadastro não reduz o saldo atual; só pagamentos confirmados entram como saída.</p>
+<div id="debtsList" class="list"></div>
+</section>
+<section id="view-planning" class="hidden">
+<div class="section-head"><h2>Planejamento</h2><button onclick="openForm('transaction')">＋ Previsão</button></div>
+<p class="notice">Previsões futuras não alteram o saldo atual até serem confirmadas. Lançamentos recorrentes geram ocorrências futuras.</p>
+<div id="planningList" class="list"></div>
+</section>
+<section id="view-settings" class="hidden">
+<h2>Configurações e backup</h2>
+<div class="panel"><h3>Saldo inicial</h3><div class="field"><label for="openingBalance">Saldo inicial atual (R$)</label><input id="openingBalance" inputmode="decimal" placeholder="0,00"></div><div class="form-actions"><button onclick="saveOpeningBalance()">Salvar saldo inicial</button></div><p class="notice">Use o saldo que você tinha no início do controle. Os lançamentos confirmados são somados ou subtraídos dele.</p></div>
+<div class="panel"><h3>Backup manual</h3><p class="notice">Mesmo usando sincronização, mantenha um arquivo de segurança de tempos em tempos.</p><div class="form-actions"><button onclick="exportBackup()">Exportar backup</button><label class="btn btn-muted" for="importFile">Importar backup</label><input id="importFile" class="hidden" type="file" accept="application/json" onchange="importBackup(event)"></div></div>
+<div class="panel"><h3>Sincronização na nuvem (opcional)</h3><p class="notice">Para ativar, crie um projeto Supabase e configure URL e chave pública abaixo. A chave pública/anon é apropriada para o navegador somente quando as políticas RLS estão corretamente configuradas. Nunca coloque uma chave secreta/service-role aqui.</p>
+<div class="form-grid"><div class="field full"><label for="supabaseUrl">Supabase Project URL</label><input id="supabaseUrl" placeholder="https://seu-projeto.supabase.co"></div><div class="field full"><label for="supabaseKey">Supabase anon/public key</label><input id="supabaseKey" placeholder="Chave pública do projeto"></div><div class="field"><label for="syncEmail">E-mail</label><input id="syncEmail" type="email" autocomplete="email"></div><div class="field"><label for="syncPassword">Senha</label><input id="syncPassword" type="password" autocomplete="current-password"></div></div>
+<div class="form-actions"><button onclick="configureCloud()">Salvar configuração</button><button class="btn-light" onclick="cloudSignUp()">Criar conta</button><button class="btn-muted" onclick="cloudSignIn()">Entrar e sincronizar</button><button class="btn-muted" onclick="cloudSignOut()">Sair</button></div><p id="cloudMessage" class="notice">A nuvem só estará ativa depois de configurar o Supabase e entrar na conta.</p></div>
+<div class="panel"><button class="btn-danger" onclick="resetApp()">Apagar todos os dados deste aparelho</button><p class="notice">Esta ação não pode ser desfeita. Exporte um backup antes.</p></div>
+</section>
+</main>
+<nav>
+<button class="active" data-view="home" onclick="showView('home',this)"><span>⌂</span>Início</button>
+<button data-view="transactions" onclick="showView('transactions',this)"><span>↕</span>Lançamentos</button>
+<button data-view="debts" onclick="showView('debts',this)"><span>▤</span>Dívidas</button>
+<button data-view="planning" onclick="showView('planning',this)"><span>▦</span>Planejamento</button>
+<button data-view="settings" onclick="showView('settings',this)"><span>⚙</span>Ajustes</button>
+</nav>
+<div id="modal" class="hidden" style="position:fixed;inset:0;background:#0007;z-index:10;overflow:auto;padding:18px 12px">
+<div class="panel" style="max-width:620px;margin:20px auto">
+<div class="section-head"><h2 id="formTitle" style="margin:0 0 14px">Novo lançamento</h2><button class="btn-muted" onclick="closeForm()">Fechar</button></div>
+<form id="entryForm">
+<div class="form-grid">
+<div class="field full"><label for="fDescription">Descrição</label><input id="fDescription" required maxlength="100" placeholder="Ex.: salário, mercado, parcela"></div>
+<div class="field"><label for="fType">Tipo</label><select id="fType"><option value="expense">Gasto</option><option value="income">Entrada</option><option value="debt">Pagamento de dívida</option></select></div>
+<div class="field"><label for="fAmount">Valor (R$)</label><input id="fAmount" required inputmode="decimal" placeholder="0,00"></div>
+<div class="field"><label for="fDate">Data</label><input id="fDate" type="date" required></div>
+<div class="field"><label for="fStatus">Situação</label><select id="fStatus"><option value="planned">Previsto</option><option value="paid">Confirmado / pago</option></select></div>
+<div class="field"><label for="fRepeat">Recorrência</label><select id="fRepeat"><option value="none">Não repetir</option><option value="weekly">Semanal</option><option value="monthly">Mensal</option><option value="yearly">Anual</option></select></div>
+<div class="field full"><label for="fCategory">Categoria (opcional)</label><input id="fCategory" maxlength="60" placeholder="Ex.: casa, transporte, trabalho"></div>
+</div><div class="form-actions"><button type="submit">Salvar lançamento</button><button type="button" class="btn-muted" onclick="closeForm()">Cancelar</button></div>
+<p class="notice">Lançamentos recorrentes geram previsões para os próximos 12 meses. Marcar uma previsão como paga cria um movimento confirmado.</p>
+</form></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js"></script>
+</body></html>
