@@ -370,6 +370,28 @@ input[type="date"] {
     grid-template-columns: repeat(4, 1fr);
   }
 }
+
+/* Cores automáticas dos valores financeiros */
+#currentBalance,
+#debtTotal,
+#projectedBalance {
+  color: #000000;
+  -webkit-text-fill-color: currentColor;
+}
+
+#currentBalance.pos,
+#debtTotal.pos,
+#projectedBalance.pos {
+  color: #16a34a !important;
+  -webkit-text-fill-color: #16a34a !important;
+}
+
+#currentBalance.neg,
+#debtTotal.neg,
+#projectedBalance.neg {
+  color: #dc2626 !important;
+  -webkit-text-fill-color: #dc2626 !important;
+}
 </style>
 </head>
 <body>
