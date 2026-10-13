@@ -234,9 +234,13 @@ function render() {
     ? recent.map(t => itemHTML(t, false)).join("")
     : '<div class="empty">Seus lançamentos aparecerão aqui.</div>';
 
-  const filtered = [...allTransactions()]
-    .filter(t => filter === "all" || t.type === filter)
-    .sort((a, b) => b.date.localeCompare(a.date));
+const filtered = [...allTransactions()]
+  .filter(t => filter === "all" || t.type === filter)
+  .sort((a, b) => {
+    const dataA = new Date(a.date + "T00:00:00").getTime();
+    const dataB = new Date(b.date + "T00:00:00").getTime();
+    return dataB - dataA;
+  });
 
   $("transactionsList").innerHTML = filtered.length
     ? filtered.map(t => itemHTML(t)).join("")
